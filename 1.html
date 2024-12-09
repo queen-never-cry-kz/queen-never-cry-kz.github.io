@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POCO Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Общие стили */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            display: block;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-right: 15px;
+            position: relative;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #ff6f00;
+        }
+
+        nav ul li ul {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #444;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: none;
+            z-index: 1000;
+        }
+
+        nav ul li:hover ul {
+            display: block;
+        }
+
+        nav ul li ul li a {
+            display: block;
+            padding: 10px 20px;
+            white-space: nowrap;
+        }
+
+        
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 250px;
+            height: 100%;
+            background-color: #444;
+            padding: 20px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .side-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .side-menu ul li {
+            margin-bottom: 15px;
+        }
+
+        .side-menu ul li a {
+            text-decoration: none;
+            color: white;
+            padding: 10px;
+            display: block;
+        }
+
+        .side-menu .close-btn {
+            text-align: right;
+            cursor: pointer;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .card {
+            background: lightgray;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .card:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .card p {
+            font-weight: bold;
+            margin: 10px 0 0;
+        }
+
+        
+        .share-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff6f00;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+            z-index: 1000;
+        }
+
+        .share-button:hover {
+            transform: scale(1.1);
+            background-color: #e65c00;
+        }
+
+        .share-menu {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .share-menu.active {
+            display: block;
+        }
+
+        .share-menu a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .share-menu a:hover {
+            background: #f4f4f4;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            /*nav ul {
+                display: none; 
+            }*/
+
+            .cards {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+                .loading-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 10px;
+            background: lightgray;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-bar .bar {
+            height: 100%;
+            animation: loading 3s infinite;
+        }
+
+        .bar.red {
+            background-color: red;
+        }
+
+        .bar.blue {
+            background-color: blue;
+            animation-delay: 0.5s;
+        }
+
+        .bar.green {
+            background-color: green;
+            animation-delay: 1s;
+        }
+
+        .bar.orange {
+            background-color: orange;
+            animation-delay: 1.5s;
+        }
+
+        .bar.purple {
+            background-color: purple;
+            animation-delay: 2s;
+        }
+
+        @keyframes loading {
+            0% {
+                transform: translateX(-100%);
+            }
+            50% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        a{
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <span class="logo">POCO Store</span>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li>
+                    <a href="#">Devices</a>
+                    <ul>
+                        <li><a href="#">POCO X Series</a></li>
+                        <li><a href="#">POCO F Series</a></li>
+                        <li><a href="#">Accessories</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="side-menu" id="sideMenu">
+        <div class="close-btn" onclick="closeMenu()">✖</div>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Devices</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>
+
+    <section class="cards">
+        <div class="card">
+            <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                <img src="px6p.jpg" alt="POCO X6 Pro">
+                <p>POCO X6 Pro: Высокая производительность и стиль</p>
+            </a>
+        </div>
+            <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="px5p.jpg" alt="POCO X5 Pro">
+                    <p>POCO X5 Pro: Камера нового уровня</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="ppad.jpg" alt="POCO Pad">
+                    <p>POCO Pad: Ваш идеальный помощник</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="ppen.png" width="80%">
+                    <p>POCO Pad: Лучше яблочного карандаша</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="pf6.jpg" width="60%">
+                    <p>POCO F6: Простота и мощь</p>
+            </a>
+            </div>
+            <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="pf5p.jpeg" width="60%">
+                    <p>POCO F5 Pro: Лучшый из лцчших</p>
+                </a>
+            </div>
+                        <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="pbuds.jpg" alt="POCO Pad">
+                    <p>POCO Buds: Как будто поют в голове</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="pkeyb.png" width="80%">
+                    <p>POCO Pad Keyboard: Для хацкеров</p>
+                </a>
+            </div>
+            <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="pwatch.jpg" width="60%">
+                    <p>POCO Watch: Тем кто ценит свое время</p>
+            </a>
+            </div>
+            <div class="card">
+                <a href="https://mi.com.kz/poco_x6_pro/xiaomi/">
+                    <img src="pcov.webp" width="60%">
+                    <p>POCO Pad Cover: Защита монстра</p>
+                </a>
+            </div>
+    </section>
+
+    <button class="share-button" onclick="toggleShareMenu()">+</button>
+    <div class="share-menu" id="shareMenu">
+        <a href="https://facebook.com">Facebook</a>
+        <a href="https://twitter.com">Twitter</a>
+        <a href="https://linkedin.com">LinkedIn</a>
+    </div>
+
+        <div class="loading-bars">
+        <div class="loading-bar"><div class="bar red"></div></div>
+        <div class="loading-bar"><div class="bar blue"></div></div>
+        <div class="loading-bar"><div class="bar green"></div></div>
+        <div class="loading-bar"><div class="bar orange"></div></div>
+        <div class="loading-bar"><div class="bar purple"></div></div>
+    </div>
+    <footer>
+        <p>&copy; 2024 POCO Store. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sideMenu').classList.toggle('active');
+        }
+
+        function closeMenu() {
+            document.getElementById('sideMenu').classList.remove('active');
+        }
+
+        function toggleShareMenu() {
+            const menu = document.getElementById('shareMenu');
+            menu.classList.toggle('active');
+        }
+
+        document.addEventListener('click', (e) => {
+            const shareMenu = document.getElementById('shareMenu');
+            if (!shareMenu.contains(e.target) && !e.target.classList.contains('share-button')) {
+                shareMenu.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
